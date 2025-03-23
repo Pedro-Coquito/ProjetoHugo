@@ -1,98 +1,98 @@
 import os
 
-def load_numbers(filename):
+def load_dados(arquivo):
     """Carrega os números do arquivo para uma lista."""
-    numbers = []
+    dados = []
     try:
-        with open(filename, "r", encoding="utf-8") as file:
+        with open(arquivo, "r", encoding="utf-8") as file:
             # Lê todos os números presentes no arquivo
             for token in file.read().split():
                 try:
-                    numbers.append(int(token))
+                    dados.append(int(token))
                 except ValueError:
                     continue
     except FileNotFoundError:
-        print("Não foi possível carregar o arquivo!", filename)
-    return numbers
+        print("Não foi possível carregar o arquivo!", arquivo)
+    return dados
 
-def save_numbers(numbers, filename):
+def save_dados(dados, arquivo):
     """Salva os números da lista no arquivo."""
     try:
-        with open(filename, "w", encoding="utf-8") as file:
-            for num in numbers:
+        with open(arquivo, "w", encoding="utf-8") as file:
+            for num in dados:
                 file.write(f"{num} ")
             file.write("\n")
     except IOError:
-        print("Erro: Nenhum arquivo encontrado!", filename)
+        print("Erro: Nenhum arquivo encontrado!", dados)
 
-def display_numbers(numbers):
+def display_dados(dados):
     """Exibe os números com sua posição."""
-    if not numbers:
+    if not dados:
         print("A lista está vazia")
     else:
         print("Lista de números")
-        for idx, num in enumerate(numbers, start=1):
+        for idx, num in enumerate(dados, start=1):
             print(f"{idx}. {num}")
 
-def add_number(numbers, filename):
+def add_number(dados, arquivo):
     """Adiciona um número à lista e salva no arquivo."""
     try:
         num = int(input("Digite um número para adicionar a lista:\n"))
-        numbers.append(num)
-        save_numbers(numbers, filename)
+        dados.append(num)
+        save_dados(dados, arquivo)
         print("Número adicionado com sucesso!!")
     except ValueError:
         print("Entrada inválida!")
 
-def remove_number(numbers, filename):
+def remove_number(dados, arquivo):
     """Remove o número informado da lista, se existir, e salva no arquivo."""
-    if not numbers:
+    if not dados:
         print("A lista está vazia, não há números para serem removidos.")
         return
     try:
         num = int(input("Digite o número que deseja remover!\n"))
-        if num in numbers:
-            numbers.remove(num)
-            save_numbers(numbers, filename)
+        if num in dados:
+            dados.remove(num)
+            save_dados(dados, arquivo)
             print("Número removido com sucesso!!")
         else:
             print("Número não encontrado na lista!!")
     except ValueError:
         print("Entrada inválida!")
 
-def sort_numbers(numbers, filename):
+def sort_dados(dados, arquivo):
     """Ordena os números em ordem crescente, se necessário, e salva no arquivo."""
-    if not numbers:
+    if not dados:
         print("A lista está vazia, nenhum número para ordenar!!")
         return
-    if numbers == sorted(numbers):
+    if dados == sorted(dados):
         print("A lista já está ordenada!!")
     else:
-        numbers.sort()
+        dados.sort()
         print("Lista ordenada em ordem crescente")
-        save_numbers(numbers, filename)
+        save_dados(dados, arquivo)
 
-def find_number(numbers, filename):
+def find_number(dados, arquivo):
     """Busca um número na lista e exibe as posições em que ele aparece."""
-    if not numbers:
+    if not dados:
         print("A lista está vazia, nenhum número para encontrar!")
         return
     try:
         num = int(input("Digite o número que quer encontrar:\n"))
-        indices = [i + 1 for i, n in enumerate(numbers) if n == num]
+        indices = [i + 1 for i, n in enumerate(dados) if n == num]
         if indices:
             print("Número encontrado nas posições:", " ".join(str(pos) for pos in indices))
         else:
             print("Número não encontrado na lista!!")
-        save_numbers(numbers, filename)
+        save_dados(dados, arquivo)
     except ValueError:
         print("Entrada inválida!")
 
 def main():
     # Limpa a tela: 'cls' para Windows, 'clear' para sistemas Unix
     os.system("cls" if os.name == "nt" else "clear")
-    filename = "Lista Numeros.txt"
-    numbers = load_numbers(filename)
+    arquivo = "Lista Numeros.txt"
+    dados = load_dados(arquivo)
 
     while True:
         print("\n===== GERENCIADOR DE NÚMEROS =====")
@@ -109,15 +109,15 @@ def main():
             continue
 
         if opcao == 1:
-            add_number(numbers, filename)
+            add_number(dados, arquivo)
         elif opcao == 2:
-            remove_number(numbers, filename)
+            remove_number(dados, arquivo)
         elif opcao == 3:
-            display_numbers(numbers)
+            display_dados(dados)
         elif opcao == 4:
-            sort_numbers(numbers, filename)
+            sort_dados(dados, arquivo)
         elif opcao == 5:
-            find_number(numbers, filename)
+            find_number(dados, arquivo)
         elif opcao == 6:
             print("Saindo do Programa...")
             break
