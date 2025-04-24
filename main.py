@@ -1,128 +1,103 @@
 import os
 
-def load_dados(arquivo):
-    """Carrega os números do arquivo para uma lista."""
-    dados = []
+def verificar_arquivo_existente(arquivo):
+    """Verifica se o arquivo já existe. Se existir, pergunta ao usuário se deseja sobrescrever ou abrir o arquivo principal."""
+    if os.path.exists(arquivo):
+        resposta = input(f"O arquivo '{arquivo}' já existe. Deseja sobrescrevê-lo? (s/n): ")
+        if resposta.lower() == 'n':
+            print("Abrindo o arquivo principal...")
+            # Retorna o nome do arquivo para abrir o arquivo sem sobrescrevê-lo
+            return arquivo
+        elif resposta.lower() == 's':
+            print(f"O arquivo '{arquivo}' será sobrescrito.")
+            return arquivo  # Sobrescreve o arquivo
+        else:
+            print("Resposta inválida. Por favor, digite 's' para sobrescrever ou 'n' para abrir o arquivo.")
+            return verificar_arquivo_existente(arquivo)  # Chama novamente para continuar o processo
+    else:
+        return arquivo  # Retorna o nome do arquivo se não existir
+
+def display_dados(arquivo):
+    """Exibe os dados diretamente do arquivo."""
+    if arquivo is None:
+        print("Erro: Nenhum arquivo válido fornecido!")
+        return  # Sai da função se o arquivo for None
+    
     try:
         with open(arquivo, "r", encoding="utf-8") as file:
-            # Lê todos os números presentes no arquivo
-            for token in file.read().split():
-                try:
-                    dados.append(int(token))
-                except ValueError:
-                    continue
+            dados = file.read()  # Lê o conteúdo do arquivo
+            if not dados:
+                print("o arquivo está vazio.")
+            else:
+                print("Conteúdo do arquivo:")
+                print(dados)  # Exibe o conteúdo do arquivo
     except FileNotFoundError:
-        print("Não foi possível carregar o arquivo!", arquivo)
-    return dados
-
-def save_dados(dados, arquivo):
-    """Salva os números da lista no arquivo."""
-    try:
-        with open(arquivo, "w", encoding="utf-8") as file:
-            for num in dados:
-                file.write(f"{num} ")
-            file.write("\n")
+        print("Arquivo não encontrado!")
     except IOError:
-        print("Erro: Nenhum arquivo encontrado!", dados)
+        print("Erro ao acessar o arquivo.")
 
-def display_dados(dados):
-    """Exibe os números com sua posição."""
-    if not dados:
-        print("A lista está vazia")
-    else:
-        print("Lista de números")
-        for idx, num in enumerate(dados, start=1):
-            print(f"{idx}. {num}")
-
-def add_number(dados, arquivo):
-    """Adiciona um número à lista e salva no arquivo."""
+def add_number(arquivo):
+    """Adiciona um dado diretamente no arquivo."""
+    entrada = input("Digite o dado para adicionar ao arquivo:\n")
     try:
-        num = int(input("Digite um número para adicionar a lista:\n"))
-        dados.append(num)
-        save_dados(dados, arquivo)
-        print("Número adicionado com sucesso!!")
-    except ValueError:
-        print("Entrada inválida!")
+        with open(arquivo, "a", encoding="utf-8") as file:  # Abre no modo 'append' para adicionar dados
+            file.write(f"{entrada} ")
+        print("Dado adicionado com sucesso!")
+    except IOError:
+        print("Erro ao adicionar dados no arquivo.")
 
-def remove_number(dados, arquivo):
-    """Remove o número informado da lista, se existir, e salva no arquivo."""
-    if not dados:
-        print("A lista está vazia, não há números para serem removidos.")
-        return
+def remove_log(arquivo):
+    """Remove o dado informado diretamente no arquivo."""
     try:
-        num = int(input("Digite o número que deseja remover!\n"))
-        if num in dados:
-            dados.remove(num)
-            save_dados(dados, arquivo)
-            print("Número removido com sucesso!!")
+        with open(arquivo, "r", encoding="utf-8") as file:
+            dados = file.read().split()  # Lê todos os dados do arquivo
+            if not dados:
+                print("O arquivo está vazio, não há dados para remover.")
+                return
+
+        entrada = input("Digite o dado que quer remover:\n")
+        
+        if entrada in dados:
+            dados.remove(entrada)
+            # Reescreve o arquivo com os dados restantes
+            with open(arquivo, "w", encoding="utf-8") as file:
+                for dado in dados:
+                    file.write(f"{dado} ")
+            print("Dado removido com sucesso!")
         else:
-            print("Número não encontrado na lista!!")
-    except ValueError:
-        print("Entrada inválida!")
-
-def sort_dados(dados, arquivo):
-    """Ordena os números em ordem crescente, se necessário, e salva no arquivo."""
-    if not dados:
-        print("A lista está vazia, nenhum número para ordenar!!")
-        return
-    if dados == sorted(dados):
-        print("A lista já está ordenada!!")
-    else:
-        dados.sort()
-        print("Lista ordenada em ordem crescente")
-        save_dados(dados, arquivo)
-
-def find_number(dados, arquivo):
-    """Busca um número na lista e exibe as posições em que ele aparece."""
-    if not dados:
-        print("A lista está vazia, nenhum número para encontrar!")
-        return
-    try:
-        num = int(input("Digite o número que quer encontrar:\n"))
-        indices = [i + 1 for i, n in enumerate(dados) if n == num]
-        if indices:
-            print("Número encontrado nas posições:", " ".join(str(pos) for pos in indices))
-        else:
-            print("Número não encontrado na lista!!")
-        save_dados(dados, arquivo)
-    except ValueError:
-        print("Entrada inválida!")
-
-def main():
-    # Limpa a tela: 'cls' para Windows, 'clear' para sistemas Unix
-    os.system("cls" if os.name == "nt" else "clear")
-    arquivo = "Lista Numeros.txt"
-    dados = load_dados(arquivo)
-
-    while True:
-        print("\n===== GERENCIADOR DE NÚMEROS =====")
-        print("1. Adicionar número")
-        print("2. Remover número")
-        print("3. Exibir números")
-        print("4. Ordenar números")
-        print("5. Buscar número")
-        print("6. Sair")
-        try:
-            opcao = int(input("Escolha uma opção: "))
-        except ValueError:
-            print("Opção inválida! Tente novamente.")
-            continue
-
-        if opcao == 1:
-            add_number(dados, arquivo)
-        elif opcao == 2:
-            remove_number(dados, arquivo)
-        elif opcao == 3:
-            display_dados(dados)
-        elif opcao == 4:
-            sort_dados(dados, arquivo)
-        elif opcao == 5:
-            find_number(dados, arquivo)
-        elif opcao == 6:
-            print("Saindo do Programa...")
-            break
-        else:
-            print("Opção inválida! Tente novamente.")
+            print("Dado não encontrado no arquivo.")
+    except FileNotFoundError:
+        print("Arquivo não encontrado!")
+    except IOError:
+        print("Erro ao modificar o arquivo.")
 
 if __name__ == "__main__":
-    main()
+    arquivo = input("Digite o nome do arquivo: ")
+    arquivo = verificar_arquivo_existente(arquivo)
+
+    if arquivo:  # Se o arquivo foi escolhido para ser sobrescrito, prossegue
+        while True:
+            print("\n===== GERENCIADOR DE DADOS =====")
+            print("1. Adicionar dados")
+            print("2. Remover dados")
+            print("3. Exibir dados")
+            print("4. Sair")
+            try:
+                opcao = int(input("Escolha uma opção: "))
+            except ValueError:
+                print("Opção inválida! Tente novamente.")
+                continue
+
+            if opcao == 1:
+                add_number(arquivo)
+            elif opcao == 2:
+                remove_log(arquivo)
+            elif opcao == 3:
+                display_dados(arquivo)
+            elif opcao == 4:
+                print("Saindo do Programa...")
+                break
+            else:
+                print("Opção inválida! Tente novamente.")
+    else:
+        print("O arquivo foi aberto e o programa continuará com os dados existentes.")
